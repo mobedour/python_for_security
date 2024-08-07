@@ -27,6 +27,14 @@ import socket
 import netifaces
 
 def get_ip_address():
+    """
+    Retrieves the local IP address and netmask of the active network interface.
+    Uses netifaces to get the addresses of all network interfaces and returns the first
+    non-localhost IPv4 address and its corresponding netmask.
+    
+    Returns:
+        tuple: (ip_address, netmask) if successful, (None, None) otherwise.
+    """
     interfaces = netifaces.interfaces()
     for interface in interfaces:
         addrs = netifaces.ifaddresses(interface)
@@ -39,6 +47,16 @@ def get_ip_address():
     return None, None
 
 def get_network_range(ip_address, netmask):
+    """
+    Calculates the network range (subnet) from the given IP address and netmask.
+    
+    Args:
+        ip_address (str): The local IP address.
+        netmask (str): The netmask corresponding to the local IP address.
+    
+    Returns:
+        str: The network range in CIDR notation (e.g., '192.168.1.0/24').
+    """
     ip_parts = ip_address.split('.')
     mask_parts = netmask.split('.')
     network_parts = [str(int(ip_parts[i]) & int(mask_parts[i])) for i in range(4)]
@@ -46,6 +64,12 @@ def get_network_range(ip_address, netmask):
     return network_range
 
 def scan_network(ip_range):
+    """
+    Scans the specified IP range for open ports and services using nmap.
+    
+    Args:
+        ip_range (str): The network range to scan in CIDR notation (e.g., '192.168.1.0/24').
+    """
     nm = nmap.PortScanner()
     nm.scan(ip_range, '1-1024', '-sV')
     for host in nm.all_hosts():
@@ -57,7 +81,10 @@ def scan_network(ip_range):
             for port in lport:
                 print(f'port: {port}\tstate: {nm[host][proto][port]["state"]}\tservice: {nm[host][proto][port]["name"]}')
 
+# Retrieve the local IP address and netmask
 ip_address, netmask = get_ip_address()
+
+# If IP address and netmask are found, calculate the network range and scan the network
 if ip_address and netmask:
     network_range = get_network_range(ip_address, netmask)
     print(f'Scanning network: {network_range}')
