@@ -8,7 +8,7 @@ Usage:
 
 2. Install the required libraries if they are not already installed:
    - nmap: `pip install python-nmap`
-   - netifaces: `sudo apt-get install python3-netifaces`
+   - netifaces: `sudo apt install python3-netifaces`
 
 3. Run the script using Python:
    - in the terminal, type:
